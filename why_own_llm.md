@@ -1,4 +1,6 @@
-Great question. Here's a clear breakdown of the **main industry issues** that come with **not using your own LLM** and instead relying on **open (public, commercial) LLMs** like ChatGPT, Claude, Gemini, etc.
+**Data Privacy With Public LLMs**
+
+Here's a clear breakdown of the **main industry issues** that come with **not using your own LLM** and instead relying on **open (public, commercial) LLMs** like ChatGPT, Claude, Gemini, etc.
 
 ---
 
