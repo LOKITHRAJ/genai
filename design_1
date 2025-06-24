@@ -1,0 +1,119 @@
+@startuml
+
+' === Core Entities ===
+
+entity Pattern {
+  *id : UUID
+  --
+  name : string
+  description : string
+}
+
+entity ControlBaseline {
+  *id : UUID
+  --
+  pattern_id : UUID
+  name : string
+  description : string
+}
+
+entity TechnicalControlImplementationRecord {
+  *id : UUID
+  --
+  control_baseline_id : UUID
+  name : string
+  rule : text
+  tool : string
+}
+
+entity ScanResult {
+  *id : UUID
+  --
+  repo_id : UUID
+  branch_name : string
+  pattern_id : UUID
+  tech_control_record_id : UUID
+  sec_arch_id : UUID
+  detected : boolean
+  scanned_at : timestamp
+}
+
+entity ScanEvidence {
+  *id : UUID
+  --
+  scan_result_id : UUID
+  evidence_type : string
+  content : text
+  source : string
+  collected_at : timestamp
+}
+
+' === Project/Repo Structure ===
+
+entity System {
+  *id : UUID
+  --
+  name : string
+}
+
+entity Project {
+  *id : UUID
+  --
+  name : string
+  system_id : UUID
+}
+
+entity Repo {
+  *id : UUID
+  --
+  name : string
+  project_id : UUID
+}
+
+' === Security Architecture Submission ===
+
+entity SecurityArchitecture {
+  *id : UUID
+  --
+  title : string
+  repo_id : UUID
+  submitted_by : UUID
+  submitted_at : timestamp
+}
+
+entity SecurityArchitectureControl {
+  *id : UUID
+  --
+  sec_arch_id : UUID
+  control_baseline_id : UUID
+  -- populated via API from SecArch team
+}
+
+' === Explicit Relationships ===
+
+' Pattern → ControlBaseline
+Pattern ||--o{ ControlBaseline : "has"
+
+' Control → Implementation
+ControlBaseline ||--o{ TechnicalControlImplementationRecord : "has"
+
+' Implementation → ScanResult
+TechnicalControlImplementationRecord ||--o{ ScanResult : "validated by"
+
+' ScanResult → Evidence
+ScanResult ||--o{ ScanEvidence : "supported by"
+
+' System Hierarchy
+System ||--o{ Project : "owns"
+Project ||--o{ Repo : "contains"
+Repo ||--o{ ScanResult : "has results"
+Pattern ||--o{ ScanResult : "matched in"
+
+' Security Architecture Submission
+Repo ||--o{ SecurityArchitecture : "submitted under"
+SecurityArchitecture ||--o{ SecurityArchitectureControl : "linked to"
+ControlBaseline ||--o{ SecurityArchitectureControl : "applies"
+
+SecurityArchitecture ||--o{ ScanResult : "validated in"
+
+@enduml
