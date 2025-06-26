@@ -1,0 +1,66 @@
+@startuml
+
+class System {
+  +id
+  +name
+}
+
+class Project {
+  +id
+  +name
+}
+
+class Repo {
+  +id
+  +url
+}
+
+class Pattern {
+  +id
+  +name
+  +description
+}
+
+class ControlBaseline {
+  +id
+  +name
+}
+
+class TechnicalControlRecord {
+  +id
+  +controlName
+  +implementationDescription
+}
+
+class SecurityArchitecture {
+  +id
+  +submittedBy
+  +submissionDate
+}
+
+class ScanResult {
+  +id
+  +status
+  +summary
+}
+
+class ScanEvidence {
+  +id
+  +type
+  +location
+}
+
+System "1" -- "*" Project : owns
+Project "1" -- "*" Repo : contains
+
+System "1" -- "*" SecurityArchitecture : has
+SecurityArchitecture "1" -- "*" ScanResult : validates
+
+Pattern "*" -- "*" ControlBaseline : maps to
+ControlBaseline "1" -- "*" TechnicalControlRecord : defines
+TechnicalControlRecord "*" -- "*" Pattern : implements
+
+TechnicalControlRecord "1" -- "0..1" ScanResult : validated by
+ScanResult "1" -- "*" ScanEvidence : includes
+
+@enduml
