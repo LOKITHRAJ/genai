@@ -1,0 +1,58 @@
+@startuml
+' === Sequence Diagram: Developer TCR Scan and Review Submission ===
+actor Developer
+entity System
+entity Project
+entity Repo
+entity Pattern
+entity ControlBaseline
+entity TechnicalControlRecord
+entity ScanResult
+entity SecurityArchitecture
+entity PTOService
+
+Developer -> System : select system
+System -> Project : list projects
+Project -> Repo : list repos
+Developer -> ControlBaseline : select baseline
+ControlBaseline -> Pattern : list applicable patterns
+ControlBaseline -> TechnicalControlRecord : list TCRs
+
+loop For each TCR
+  Developer -> Repo : trigger scan for TCR
+  Repo -> ScanResult : run static/dynamic analysis
+end
+
+Developer -> ScanResult : verify all TCRs passed
+alt all passed
+  Developer -> SecurityArchitecture : submit for review
+  SecurityArchitecture -> SecurityArchitecture : update status = "UnderReview"
+end
+
+alt reviewer approves
+  SecurityArchitecture -> SecurityArchitecture : update status = "Completed"
+  SecurityArchitecture -> PTOService : send PTO request
+end
+@enduml
+
+@startuml
+' === Component Diagram ===
+package "Security Validation Platform" {
+  [Frontend UI] --> [Scan Controller]
+  [Scan Controller] --> [TCR Service]
+  [Scan Controller] --> [Repo Service]
+  [Scan Controller] --> [Scan Engine]
+  [Scan Engine] --> [Evidence Store]
+  [TCR Service] --> [Metadata DB]
+  [Repo Service] --> [Repo Index]
+  [Scan Controller] --> [Result Processor]
+  [Result Processor] --> [Metadata DB]
+  [Result Processor] --> [PTO Service]
+  [Frontend UI] --> [SecurityArchitecture Service]
+  [SecurityArchitecture Service] --> [Metadata DB]
+  [Frontend UI] --> [ControlBaseline Service]
+  [ControlBaseline Service] --> [Metadata DB]
+  [Frontend UI] --> [System Service]
+  [System Service] --> [Metadata DB]
+}
+@enduml
