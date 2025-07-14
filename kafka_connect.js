@@ -2,23 +2,20 @@ import fs from 'fs';
 import { Kafka } from 'kafkajs';
 
 const kafka = new Kafka({
-  clientId: 'graphql-api',
-  brokers: ['your-kafka-broker:9093'], // Port usually changes for SSL
-  ssl: {
-    rejectUnauthorized: true, // Set to false if using self-signed certs
-    ca: [fs.readFileSync('/path/to/ca.crt', 'utf-8')],
-    key: fs.readFileSync('/path/to/client.key', 'utf-8'),
-    cert: fs.readFileSync('/path/to/client.crt', 'utf-8'),
-  },
+  clientId: 'graphql-api',
+  brokers: ['your-kafka-broker:9093'], // Replace with actual broker address
+  ssl: {
+    rejectUnauthorized: true, // set to false if using self-signed certs
+    ca: [fs.readFileSync('./certs/ca.crt', 'utf-8')],
+    key: fs.readFileSync('./certs/client.key', 'utf-8'),
+    cert: fs.readFileSync('./certs/client.crt', 'utf-8'),
+  },
 });
 
-
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'graphql-group' });https://github.com/LOKITHRAJ/genai/tree/main
-
+const consumer = kafka.consumer({ groupId: 'graphql-group' });
 const messages = [];
 
-// ✅ Define only once
 async function connectProducerWithRetry(retries = 5, delayMs = 5000) {
   let attempt = 0;
 
@@ -46,7 +43,6 @@ async function connectProducerWithRetry(retries = 5, delayMs = 5000) {
   throw new Error("❌ Kafka producer connection failed after all retries.");
 }
 
-// ✅ No duplicate function or export
 const startConsumer = async () => {
   try {
     await consumer.connect();
